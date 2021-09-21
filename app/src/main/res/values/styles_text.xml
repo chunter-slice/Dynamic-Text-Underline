@@ -9,7 +9,6 @@
     </style>
     <style name="Slice.TextAppearance.Standard.Type2">
         <item name="android:textSize">36sp</item>
-        <item name="android:textColor">@color/black</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>

@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth(),
                             text = title,
                             underlineText = "today!",
-                            textStyle = MaterialTheme.typography.h4,
+                            textStyle = MaterialTheme.typography.h2,
                             drawableRes = R.drawable.ic_underline,
                         )
                         TextWithUnderlineImage(

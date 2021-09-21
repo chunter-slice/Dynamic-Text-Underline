@@ -34,6 +34,9 @@ fun TextWithUnderlineImage(
             text = text,
             style = textStyle,
             onTextLayout = { textLayoutResult ->
+                // In Compose, the bounding box also gives us the exact coordinates of the text so
+                // the position of the underline is easily determined
+
                 val underlineTextIndex = text.indexOf(underlineText)
                 val underlineTextBounds = textLayoutResult.getPathForRange(
                     underlineTextIndex,
@@ -42,7 +45,6 @@ fun TextWithUnderlineImage(
 
                 state = TextWithUnderlineImageState(
                     underlineWidth = underlineTextBounds.width,
-                    underlineHeight = underlineTextBounds.height,
                     underlinePaddingTop = underlineTextBounds.top + textLayoutResult.firstBaseline,
                     underlinePaddingStart = underlineTextBounds.left
                 )
@@ -55,22 +57,15 @@ fun TextWithUnderlineImage(
                 .size(width = state.underlineWidth.toDp(), height = 24.dp)
         }
         if (drawableRes != -1) {
-            DrawableUnderline(
-                modifier = imageModifier,
-                drawableRes = drawableRes,
-            )
+            DrawableUnderline(modifier = imageModifier, drawableRes = drawableRes)
         } else if (lottieFile != null) {
-            LottieUnderline(
-                modifier = imageModifier,
-                lottieFile = lottieFile,
-            )
+            LottieUnderline(modifier = imageModifier, lottieFile = lottieFile)
         }
     }
 }
 
 data class TextWithUnderlineImageState(
     val underlineWidth: Float = 0f,
-    val underlineHeight: Float = 0f,
     val underlinePaddingTop: Float = 0f,
     val underlinePaddingStart: Float = 0f,
 )

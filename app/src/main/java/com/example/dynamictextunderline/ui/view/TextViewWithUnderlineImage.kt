@@ -13,7 +13,6 @@ import androidx.core.view.updateLayoutParams
 import com.example.dynamictextunderline.R
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.airbnb.lottie.LottieAnimationView
-import kotlin.math.absoluteValue
 
 class TextViewWithUnderlineImage : FrameLayout {
 
@@ -70,6 +69,8 @@ class TextViewWithUnderlineImage : FrameLayout {
         var selectedLine = 0
         var selectedLineStartIndex = 0
         var selectedLineEndIndex = 0
+
+        // Search the text view lines for the underlined text and get the start and end indexes for that line
         for (lineIndex in 1..textView.lineCount) {
             if (textView.layout.getLineStart(lineIndex) > startIndex) {
                 selectedLine = lineIndex - 1
@@ -80,7 +81,14 @@ class TextViewWithUnderlineImage : FrameLayout {
         }
 
         imageView.updateLayoutParams<MarginLayoutParams> {
+            // The top margin for the underline is simply the baseline for its line
             topMargin = textView.layout.getLineBaseline(selectedLine)
+
+            // To calculate the start margin we check certain conditions
+            // - if the underline text appears at the start of the line, no margin is needed
+            // - if the underline text appears at the end of the line, subtract the total line width
+            //   from the width of the underline text
+            // - otherwise calculate the width of the leading text
             marginStart = when {
                 startIndex == 0 || selectedLineStartIndex == startIndex -> 0
                 endIndex == textView.text.length || selectedLineEndIndex == endIndex -> {
@@ -123,6 +131,7 @@ class TextViewWithUnderlineImage : FrameLayout {
         ).apply { text = titleText }
         addView(textView)
 
+        // Retrieve the bounds of the underline text so we can correctly size the underline
         textView.paint.getTextBounds(
             textToUnderline,
             0,
