@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="TextViewWithUnderlineImage">
+        <attr name="text" format="string"/>
+        <attr name="textStyle" format="reference" />
+        <attr name="textToUnderline" format="string" />
+        <attr name="drawableUnderline" format="reference" />
+        <attr name="lottieUnderline" format="string" />
+    </declare-styleable>
+
+</resources>
