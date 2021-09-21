@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -16,14 +17,14 @@ import com.airbnb.lottie.LottieAnimationView
 
 class TextViewWithUnderlineImage : FrameLayout {
 
-    private val underlineTextBounds = Rect()
-    private val leadingTextBounds = Rect()
+    private val underlineTextPath = Path()
+    private val underlineTextBounds = RectF()
 
     private lateinit var textView: TextView
-    private lateinit var imageView: ImageView
+    private var imageView: ImageView? = null
 
     private var textToUnderline: String = ""
-    private var startIndex: Int = 0
+    private var startIndex: Int = -1
     private var endIndex: Int = 0
 
     constructor(context: Context) : this(context, null, 0)
@@ -66,51 +67,25 @@ class TextViewWithUnderlineImage : FrameLayout {
         super.onLayout(changed, left, top, right, bottom)
         if (!changed) return
 
-        var selectedLine = 0
-        var selectedLineStartIndex = 0
-        var selectedLineEndIndex = 0
+        // Now that the TextView is correctly laid out get the exact bounds of the underline text so
+        // that the underline can be correctly positioned
+        textView.layout.getSelectionPath(startIndex, endIndex, underlineTextPath)
+        underlineTextPath.computeBounds(underlineTextBounds, true)
 
-        // Search the text view lines for the underlined text and get the start and end indexes for that line
+        // Search the TextView lines for the underlined text
+        var selectedLine = 0
         for (lineIndex in 1..textView.lineCount) {
             if (textView.layout.getLineStart(lineIndex) > startIndex) {
                 selectedLine = lineIndex - 1
-                selectedLineStartIndex = textView.layout.getLineStart(selectedLine)
-                selectedLineEndIndex = textView.layout.getLineEnd(selectedLine)
                 break
             }
         }
 
-        imageView.updateLayoutParams<MarginLayoutParams> {
-            // The top margin for the underline is simply the baseline for its line
+        imageView?.updateLayoutParams<MarginLayoutParams> {
+            // Set top margin to be its line base line so that there is no gap between the underline
+            // and the text
             topMargin = textView.layout.getLineBaseline(selectedLine)
-
-            // To calculate the start margin we check certain conditions
-            // - if the underline text appears at the start of the line, no margin is needed
-            // - if the underline text appears at the end of the line, subtract the total line width
-            //   from the width of the underline text
-            // - otherwise calculate the width of the leading text
-            marginStart = when {
-                startIndex == 0 || selectedLineStartIndex == startIndex -> 0
-                endIndex == textView.text.length || selectedLineEndIndex == endIndex -> {
-                    textView.layout.getLineWidth(selectedLine).toInt() - underlineTextBounds.width()
-                }
-                else -> {
-                    textView.paint.getTextBounds(
-                        textView.text.toString(),
-                        selectedLineStartIndex,
-                        startIndex,
-                        leadingTextBounds
-                    )
-
-                    // Spaces are trimmed when measuring text bounds so we must add it manually if it exists
-                    val spaceOffset = if (textView.text[startIndex - 1].isWhitespace()) {
-                        textView.paint.measureText(" ").toInt()
-                    } else {
-                        0
-                    }
-                    leadingTextBounds.width() + spaceOffset
-                }
-            }
+            marginStart = underlineTextBounds.left.toInt()
         }
 
         (imageView as? LottieAnimationView)?.also { it.playAnimation() }
@@ -119,8 +94,6 @@ class TextViewWithUnderlineImage : FrameLayout {
     private fun initTitleTextView(typedArray: TypedArray) {
         val titleText = typedArray.getString(R.styleable.TextViewWithUnderlineImage_text) ?: ""
         startIndex = titleText.indexOf(textToUnderline, ignoreCase = true)
-        if (startIndex == -1) throw IllegalStateException("textToUnderline must exist in text")
-
         endIndex = startIndex + textToUnderline.length
 
         textView = TextView(
@@ -130,18 +103,15 @@ class TextViewWithUnderlineImage : FrameLayout {
             typedArray.getResourceId(R.styleable.TextViewWithUnderlineImage_textStyle, 0)
         ).apply { text = titleText }
         addView(textView)
-
-        // Retrieve the bounds of the underline text so we can correctly size the underline
-        textView.paint.getTextBounds(
-            textToUnderline,
-            0,
-            textToUnderline.length,
-            underlineTextBounds
-        )
     }
 
     private fun initUnderlineView(typedArray: TypedArray) {
-        imageView = if (typedArray.hasValue(R.styleable.TextViewWithUnderlineImage_lottieUnderline)) {
+        if (startIndex == -1) {
+            Log.e(TAG, "$textToUnderline does not exist in text, no underline rendered")
+            return
+        }
+
+        val imageView = if (typedArray.hasValue(R.styleable.TextViewWithUnderlineImage_lottieUnderline)) {
             LottieAnimationView(context).apply {
                 setAnimation(
                     typedArray.getString(R.styleable.TextViewWithUnderlineImage_lottieUnderline) ?: ""
@@ -171,5 +141,11 @@ class TextViewWithUnderlineImage : FrameLayout {
                 TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, resources.displayMetrics).toInt()
             )
         )
+        this.imageView = imageView
+    }
+
+    companion object {
+
+        private const val TAG = "TextViewWithUnderlineImage"
     }
 }
