@@ -21,8 +21,8 @@ class TextViewWithUnderlineImage : FrameLayout {
     private val underlineTextBounds = RectF()
 
     private lateinit var textView: TextView
-    private var imageView: ImageView? = null
 
+    private var imageView: ImageView? = null
     private var textToUnderline: String = ""
     private var startIndex: Int = -1
     private var endIndex: Int = 0
@@ -56,7 +56,13 @@ class TextViewWithUnderlineImage : FrameLayout {
                 throw IllegalArgumentException("Provide only one of either lottieUnderline or drawableUnderline")
             }
 
-            textToUnderline = getString(R.styleable.TextViewWithUnderlineImage_textToUnderline) ?: ""
+            textToUnderline = (getString(R.styleable.TextViewWithUnderlineImage_textToUnderline) ?: "").let {
+                if (getBoolean(R.styleable.TextViewWithUnderlineImage_android_textAllCaps, false)) {
+                    it.uppercase()
+                } else {
+                    it
+                }
+            }
 
             initTitleTextView(this)
             initUnderlineView(this)
@@ -82,8 +88,7 @@ class TextViewWithUnderlineImage : FrameLayout {
         }
 
         imageView?.updateLayoutParams<MarginLayoutParams> {
-            // Set top margin to be its line base line so that there is no gap between the underline
-            // and the text
+            // Set top margin to be its line base line so that there is no noticeably gap between the underline and the text
             topMargin = textView.layout.getLineBaseline(selectedLine)
             marginStart = underlineTextBounds.left.toInt()
         }
@@ -92,7 +97,8 @@ class TextViewWithUnderlineImage : FrameLayout {
     }
 
     private fun initTitleTextView(typedArray: TypedArray) {
-        val titleText = typedArray.getString(R.styleable.TextViewWithUnderlineImage_text) ?: ""
+        val titleText = typedArray.getString(R.styleable.TextViewWithUnderlineImage_android_text) ?: ""
+
         startIndex = titleText.indexOf(textToUnderline, ignoreCase = true)
         endIndex = startIndex + textToUnderline.length
 
@@ -101,7 +107,14 @@ class TextViewWithUnderlineImage : FrameLayout {
             null,
             0,
             typedArray.getResourceId(R.styleable.TextViewWithUnderlineImage_textStyle, 0)
-        ).apply { text = titleText }
+        ).apply {
+            text = if (typedArray.getBoolean(R.styleable.TextViewWithUnderlineImage_android_textAllCaps, false)) {
+                titleText.uppercase()
+            } else {
+                titleText
+            }
+            gravity = typedArray.getInt(R.styleable.TextViewWithUnderlineImage_android_gravity, 0)
+        }
         addView(textView)
     }
 

@@ -2,7 +2,9 @@
 <resources>
 
     <declare-styleable name="TextViewWithUnderlineImage">
-        <attr name="text" format="string"/>
+        <attr name="android:gravity" format="flags" />
+        <attr name="android:text" format="string"/>
+        <attr name="android:textAllCaps" format="boolean" />
         <attr name="textStyle" format="reference" />
         <attr name="textToUnderline" format="string" />
         <attr name="drawableUnderline" format="reference" />
