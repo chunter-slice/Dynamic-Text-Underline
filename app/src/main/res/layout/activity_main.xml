@@ -8,7 +8,7 @@
         android:id="@+id/drawableTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Find a pizzeria today!"
+        android:text="@string/find_a_pizzeria_today"
         android:textAllCaps="true"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
@@ -16,21 +16,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/animatedTitle"
         app:textStyle="@style/Slice.TextAppearance.Standard.Type2"
-        app:textToUnderline="today!"
+        app:textToUnderline="@string/underline_string"
         app:drawableUnderline="@drawable/ic_underline"/>
 
     <com.example.dynamictextunderline.ui.view.TextViewWithUnderlineImage
         android:id="@+id/animatedTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Find a pizzeria today!"
+        android:text="@string/find_a_pizzeria_today"
         android:gravity="end"
         app:layout_constraintTop_toBottomOf="@id/drawableTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:textStyle="@style/Slice.TextAppearance.Standard"
-        app:textToUnderline="today!"
+        app:textToUnderline="@string/underline_string"
         app:lottieUnderline="animations/underline.json"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

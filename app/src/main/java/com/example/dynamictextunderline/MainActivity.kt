@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.example.dynamictextunderline.ui.composable.TextWithUnderlineImage
 import com.example.dynamictextunderline.ui.theme.DynamicTextUnderlineTheme
 
@@ -18,22 +19,20 @@ class MainActivity : ComponentActivity() {
         if (isView) {
             setContentView(R.layout.activity_main)
         } else {
-            val title = "Find a pizzeria today!"
-
             setContent {
                 DynamicTextUnderlineTheme {
                     Column {
                         TextWithUnderlineImage(
                             modifier = Modifier.fillMaxWidth(),
-                            text = title,
-                            underlineText = "today!",
+                            text = stringResource(id = R.string.find_a_pizzeria_today),
+                            underlineText = stringResource(id = R.string.underline_string),
                             textStyle = MaterialTheme.typography.h2,
                             drawableRes = R.drawable.ic_underline,
                         )
                         TextWithUnderlineImage(
                             modifier = Modifier.fillMaxWidth(),
-                            text = title,
-                            underlineText = "pizzeria",
+                            text = stringResource(id = R.string.find_a_pizzeria_today),
+                            underlineText = stringResource(id = R.string.underline_string),
                             textStyle = MaterialTheme.typography.h4,
                             lottieFile = "animations/underline.json",
                         )
